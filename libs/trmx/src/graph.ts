@@ -1,6 +1,6 @@
 import { Data, DataGraph, DataTemplateFn, TrvDef } from './types';
 import { KEY_REFBY, KEY_TYPE } from './const';
-import { isArray } from './utils';
+import { isArray } from '@pscale/util';
 
 export const createRefs = (
   vsData: Data[],

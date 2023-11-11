@@ -6,16 +6,15 @@ import {
   KEY_ROOT,
   KEY_META,
 } from "./const";
+import { Primitive } from "@pscale/util";
+
 
 /**
  * value in the data store.
  * Could be any primitive, array or map with string as key
  */
 export type Value =
-  | string
-  | number
-  | boolean
-  | null
+  | Primitive
   | Value[]
   | { [key: string]: Value };
 

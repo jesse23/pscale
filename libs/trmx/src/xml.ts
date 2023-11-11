@@ -1,4 +1,4 @@
-import { Tag, parser as createParser } from "sax";
+import { Tag, parser as createParser } from 'sax';
 import {
   KEY_CHILD,
   KEY_REFBY,
@@ -6,14 +6,15 @@ import {
   KEY_TEXT,
   KEY_TRM,
   KEY_TYPE,
-} from "./const";
-import { Data, DataGraph, DataTemplateFn, XMLOutput } from "./types";
-import { applyTemplate, setupGraph } from "./graph";
+} from './const';
+import { Data, DataGraph, DataTemplateFn, XMLOutput } from './types';
+import { applyTemplate, setupGraph } from './graph';
 
 interface XMLParseOptions {
-  elem_as?: "object" | "attr" | "hybrid";
+  elem_as?: 'object' | 'attr' | 'hybrid';
   attr_prefix?: string;
   template?: DataTemplateFn;
+  asTree?: boolean;
 }
 
 export const createNodeProcessor = (
@@ -21,9 +22,12 @@ export const createNodeProcessor = (
   g?: DataGraph
 ) => {
   const path = [{}] as Data[];
+  let rootTag = '';
 
   return {
+    getRootTag: () => rootTag,
     addNode: (node: { name: string; attributes: Record<string, string> }) => {
+      rootTag = rootTag || node.name;
       const type = node.name;
       const obj = {
         [KEY_TYPE]: type,
@@ -38,8 +42,8 @@ export const createNodeProcessor = (
       path.push(obj);
       if (
         g &&
-        (options.elem_as === "object" ||
-          (options.elem_as === "hybrid" && path.length === 2))
+        (options.elem_as === 'object' ||
+          (options.elem_as === 'hybrid' && path.length === 2))
       ) {
         // NOTE: this is needed otherwise the order will be wrong for item>item case.
         g[type] = ([] as Data[]).concat(g[type] || [], obj);
@@ -53,11 +57,10 @@ export const createNodeProcessor = (
       const obj = path.pop();
 
       // add to parent as KEY_CHILD
-      const key: string = KEY_CHILD;
       const parent = path[path.length - 1] || {};
-      parent[key] = [].concat(parent[key] || [], obj);
+      parent[KEY_CHILD] = [].concat(parent[KEY_CHILD] || [], obj);
 
-      if (options.elem_as === "attr") {
+      if (options.elem_as === 'attr') {
         (obj[KEY_CHILD] || []).forEach((child) => {
           const { [KEY_TYPE]: type, [KEY_TEXT]: text, ...rest } = child;
           const value =
@@ -69,7 +72,7 @@ export const createNodeProcessor = (
           obj[type] = obj[type] ? [].concat(obj[type] || [], value) : value;
         });
         delete obj[KEY_CHILD];
-      } else if (options.elem_as === "hybrid") {
+      } else if (options.elem_as === 'hybrid') {
         const filteredChildren = (obj[KEY_CHILD] || []).reduce(
           (prev, child) => {
             const {
@@ -107,21 +110,36 @@ export const createNodeProcessor = (
 };
 
 /**
+ * Convert XML to data node tree 
+ *
+ * @param source XML input as string array
+ * @param options XML parse options
+ * @returns data node as tree
+ */
+export function fromXML(
+  source: string[],
+  options: { asTree: true }
+): Record<string, unknown>;
+
+/**
  * Convert XML to data graph
  *
- * @param input XML input as string
- * @param template template as string array
+ * @param source XML input as string array
+ * @param options XML parse options
  * @returns data graph
  */
-export const fromXML = (
+export function fromXML(source: string[], options?: XMLParseOptions): DataGraph;
+
+// impl
+export function fromXML(
   source: string[],
   options = {} as XMLParseOptions
-): DataGraph => {
+): DataGraph | Record<string, unknown> {
   const graph = {} as DataGraph;
   const parser = createParser(true);
   const proc = createNodeProcessor(
     {
-      elem_as: "object",
+      elem_as: 'object',
       ...options,
     },
     graph
@@ -142,20 +160,26 @@ export const fromXML = (
     // could have some summary print here
   };
 
-  parser.write(source.join("")).close();
+  parser.write(source.join('')).close();
 
-  // return ctx.path.pop() as DataGraph;
-  return setupGraph(options.elem_as === "attr"
-    ? applyTemplate(proc.completeNode(), options.template || ((ds) => ({ 'xml': [ds] })))
-    : graph);
-};
+  return options.asTree
+    ? graph[proc.getRootTag()][0]
+    : setupGraph(
+        options.elem_as === 'attr'
+          ? applyTemplate(
+              proc.completeNode(),
+              options.template || ((ds) => ({ xml: [ds] }))
+            )
+          : graph
+      );
+}
 
-const nodeToXML = (node: Data, indent = 0): string[] => {
+export const nodeToXML = (node: Record<string, unknown>, indent = 0): string[] => {
   const type = node[KEY_TYPE];
   const res = [] as string[];
 
   // element start
-  const currElem = [`${" ".repeat(indent)}<${type}`];
+  const currElem = [`${' '.repeat(indent)}<${type}`];
 
   // attr
   Object.entries(node).forEach(([key, value]) => {
@@ -171,12 +195,12 @@ const nodeToXML = (node: Data, indent = 0): string[] => {
   });
 
   // elem end
-  currElem.push(">");
-  res.push(currElem.join(""));
+  currElem.push('>');
+  res.push(currElem.join(''));
 
   // child
   if (node[KEY_CHILD]) {
-    ([] as Data[]).concat(node[KEY_CHILD]).forEach((child) => {
+    ([]).concat(node[KEY_CHILD]).forEach((child) => {
       res.push(...nodeToXML(child, indent + 2));
     });
   }
@@ -184,11 +208,11 @@ const nodeToXML = (node: Data, indent = 0): string[] => {
   // text
   const text = (node[KEY_TEXT] as string)?.trim();
   if (text) {
-    res.push(`${" ".repeat(indent + 2)}${text}`);
+    res.push(`${' '.repeat(indent + 2)}${text}`);
   }
 
   // elem end
-  res.push(`${" ".repeat(indent)}</${type}>`);
+  res.push(`${' '.repeat(indent)}</${type}>`);
 
   return res;
 };

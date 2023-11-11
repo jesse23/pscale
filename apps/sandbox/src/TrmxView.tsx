@@ -1,10 +1,10 @@
 import { Allotment } from 'allotment';
 import { CodeEditor } from './CodeEditor';
 import { useEffect, useState } from 'react';
-import { trmx } from 'trmx';
-import styles from './SandboxGrid.module.css';
+import { trmx } from '@pscale/trmx';
+import styles from './View.module.css';
 import 'allotment/dist/style.css';
-import { evalExpression } from 'libs/trmx/src/utils';
+import { evalExpression } from '@pscale/util';
 import { Options } from 'libs/trmx/src/types';
 
 const EXAMPLE = {
@@ -92,7 +92,7 @@ const EXAMPLE = {
   },
 };
 
-export default function App() {
+export default function TrmxPanel() {
   // rules
   const [rules, setRules] = useState(EXAMPLE.xml.rules.join('\n').trim());
 
@@ -118,7 +118,7 @@ export default function App() {
   }, [rules, src, tar, cfg]);
 
   return (
-    <div className={styles.container} style={{ minHeight: 200, minWidth: 200 }}>
+    <div className={styles.container}>
       <Allotment minSize={400}>
         {/* Left Pane - Rule + Config */}
         <Allotment.Pane>
@@ -131,7 +131,7 @@ export default function App() {
             </Allotment.Pane>
           </Allotment>
         </Allotment.Pane>
-        {/* Left Pane - Source + Target */}
+        {/* Right Pane - Source + Target */}
         <Allotment.Pane minSize={400}>
           <Allotment vertical>
             <Allotment.Pane minSize={100}>

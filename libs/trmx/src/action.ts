@@ -8,7 +8,7 @@ import {
   Value,
   DataGraph,
 } from "./types";
-import { evalExpression } from "./utils";
+import { evalExpression } from "@pscale/util";
 import { VAR_SRC, VAR_VAL, KEY_TYPE } from "./const";
 import { createRefs, trvByPaths } from "./graph";
 

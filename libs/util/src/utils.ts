@@ -1,4 +1,4 @@
-import { Data } from "./types";
+import { Primitive } from "./types";
 
 /**
  * evaluate string as Javascript expression
@@ -38,10 +38,10 @@ export const evalExpression = (
  * @param path path to fetch from scope
  * @returns value from specific path
  */
-export const getValue = (scope: Data, path: string): Data => {
+export const getValue = (scope: unknown, path: string): unknown => {
   // return _.get( scope, expr );
   // TODO: when the scope has .xxx, evalFunction will fail but _.get still success
-  return evalExpression(path, scope, true) as Data;
+  return evalExpression(path, scope, true) as unknown;
 };
 
 /**
@@ -74,9 +74,26 @@ export const deepEqual = (a: unknown, b: unknown): boolean => {
  * @param val input value
  * @returns true if input is number or string
  */
-export const isPrimitive = (val: unknown): boolean => {
+export const isPrimitive = (val: unknown): val is Primitive => {
   const type = typeof val;
   return type === "number" || type === "string" || type === "boolean";
 };
 
 export const isArray = Array.isArray;
+
+export const isObject = (val: unknown): val is Record<string|number,unknown> => {
+    // Check if obj is an object and not null
+    if (typeof val !== 'object' || val === null || val === undefined) {
+        return false;
+    }
+
+    // Check if obj is not an array
+    if (Array.isArray(val)) {
+        return false;
+    }
+
+    return true;
+
+    // Optionally, you can also check if all keys are strings, which is always true for JavaScript objects
+    // return Object.keys(obj).every(key => typeof key === 'string');
+}

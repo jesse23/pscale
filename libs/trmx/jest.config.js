@@ -1,11 +1,13 @@
-/* eslint-env node */
-module.exports = {
+import { get } from 'alias-hq';
+
+export default {
+  moduleNameMapper: get('jest'),
   transform: {
-    "^.+\\.tsx?$": [
+    "^.+\\.(t|j)sx?$": [
       "esbuild-jest",
       {
         sourcemap: "both",
       },
     ],
-  },
-};
+  }
+}
