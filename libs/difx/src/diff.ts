@@ -37,8 +37,9 @@ export const diff = (
         const { idx: srcIdx, val: srcVal } = srcMap[key];
         if (isArray(srcVal) && isArray(tarVal)) {
           const subPatch = diff(srcVal, tarVal, opts);
-          // only REORDER
-          if (Object.keys(subPatch).length > (reorder ? 1 : 0)) {
+          // NOTE: even only reorder, we still need to mark it as MERGE,
+          // otherwise the delta info will be lost.
+          if (Object.keys(subPatch).length > 0) {
             acc[ActionType.MERGE] = (acc[ActionType.MERGE] || []).concat({
               idx: srcIdx,
               key,
@@ -47,7 +48,7 @@ export const diff = (
           }
         } else if (isObject(srcVal) && isObject(tarVal)) {
           const subPatch = diff(srcVal, tarVal, opts);
-          if (Object.keys(subPatch).length > (reorder ? 1 : 0)) {
+          if (Object.keys(subPatch).length > 0) {
             acc[ActionType.MERGE] = (acc[ActionType.MERGE] || []).concat({
               idx: srcIdx,
               key,

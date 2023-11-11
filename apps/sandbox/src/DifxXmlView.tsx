@@ -76,18 +76,21 @@ export default function DifxXmlView() {
       const tarData = nodeFromXML(tar.split('\n'));
       const destData = nodeFromXML(dest.split('\n'));
       const opts = { reorder: true, key: 'id', tag:'__type', defaultTag: 'xml', name: 'name' };
+      // option to xml without id and name
+      // const opts = { reorder: true, key: '__type', tag:'__type', defaultTag: 'xml', name: '__type' };
       const patch = diff(srcData, tarData, opts);
       const nodes = view(destData, patch, opts);
-      setViewNodes(nodes);
+      setViewNodes(() => nodes);
       const final = apply(destData, patch, opts);
       if(isObject(final)) {
-        setResult(nodeToXML(final).join('\n'));
+        setResult(() => nodeToXML(final).join('\n'));
       } 
       // setResult(JSON.stringify(final, null, 2));
     } catch (e) {
       setResult((e as Error).stack || '');
+      // throw e;
     }
-  }, [src, tar, dest, result]);
+  }, [src, tar, dest]);
 
   return (
     <div className={styles.container}>

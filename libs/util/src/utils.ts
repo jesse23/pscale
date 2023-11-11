@@ -76,7 +76,7 @@ export const deepEqual = (a: unknown, b: unknown): boolean => {
  */
 export const isPrimitive = (val: unknown): val is Primitive => {
   const type = typeof val;
-  return type === "number" || type === "string" || type === "boolean";
+  return val === undefined || val === null || type === "number" || type === "string" || type === "boolean";
 };
 
 export const isArray = Array.isArray;

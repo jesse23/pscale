@@ -112,9 +112,10 @@ export const preview = (
         ? srcAsArray[idx]
         : srcKeyMap[key];
     if (srcIdxKeyVal) {
-      const { arr, sub } = preview(srcIdxKeyVal.val, val, opts);
-      changed = true;
-      res[idx].act = ActionType.UPDATE;
+      const { idx } = srcIdxKeyVal;
+      const { act, arr, sub } = preview(srcIdxKeyVal.val, val, opts);
+      changed = changed || act !== ActionType.NONE;
+      res[idx].act = act;
       res[idx].sub = sub;
       if (arr) {
         res[idx].arr = arr;

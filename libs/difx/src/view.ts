@@ -1,5 +1,5 @@
 import { preview } from './preview';
-import { Change, Patch, ViewNode, ViewOptions } from './types';
+import { ActionType, Change, Patch, ViewNode, ViewOptions } from './types';
 
 /**
  * Convert change to view node
@@ -44,17 +44,6 @@ const toNode = (change: Change, opts: ViewOptions): ViewNode => {
     }
   );
 
-  // getName callback
-  const getName = (p) => {
-    const { src, tar } = (p.sub || []).filter(
-      (s) => s.key === opts.name
-    )[0] || {
-      src: '<object>',
-      tar: '<object>',
-    };
-    return { src, tar };
-  };
-
   // getTag callback
   const getTag = (p) => {
     const { src, tar } = (p.sub || []).filter((s) => s.key === opts.tag)[0] || {
@@ -72,11 +61,33 @@ const toNode = (change: Change, opts: ViewOptions): ViewNode => {
     return res || opts.defaultTag;
   };
 
+  // getName callback
+  const getName = (p, act) => {
+    const tagName = getTag(p);
+    const { src, tar } =
+      (p.sub || []).filter((s) => s.key === opts.name)[0] ||
+      (act === ActionType.ADD
+        ? {
+            src: undefined,
+            tar: tagName || '<object>',
+          }
+        : act == ActionType.DELETE
+        ? {
+            src: tagName || '<object>',
+            tar: undefined,
+          }
+        : {
+            src: tagName || '<object>',
+            tar: tagName || '<object>',
+          });
+    return { src, tar };
+  };
+
   // get att
   return {
     act: change.act,
     tag: getTag(change),
-    ...getName(change),
+    ...getName(change, change.act),
     ...(change.mov ? { mov: true } : {}),
     ...(att.length > 0 ? { att } : {}),
     ...(sub.length > 0 ? { sub } : {}),

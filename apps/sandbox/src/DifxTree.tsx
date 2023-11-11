@@ -240,7 +240,6 @@ export default function DifxTree({
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0 }}
                 onClick={() => {
-                  console.log(row.original);
                   onSelect(row.original);
                 }}
                 bgColor={

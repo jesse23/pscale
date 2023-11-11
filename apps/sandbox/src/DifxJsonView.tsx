@@ -119,14 +119,17 @@ export default function DifxJsonView() {
       const srcData = evalExpression(src) as Record<string, unknown>;
       const tarData = evalExpression(tar) as Record<string, unknown>;
       const destData = evalExpression(dest) as Record<string, unknown>;
-      const opts = { reorder: true, key: 'id', defaultTag: 'groups', name: 'name' };
+      const opts = { reorder: true, key: 'id', defaultTag: '', name: 'name' };
+      // for object without key id
+      // const opts = { reorder: true, key: 'name', defaultTag: '', name: 'name' };
       const patch = diff(srcData, tarData, opts);
       const nodes = view(destData, patch, opts);
       const final = apply(destData, patch, opts);
-      setViewNodes(nodes);
-      setResult(JSON.stringify(final, null, 2));
+      setViewNodes(() => nodes);
+      setResult(() => JSON.stringify(final, null, 2));
     } catch (e) {
       setResult((e as Error).stack || '');
+      // throw e;
     }
   }, [src, tar, dest]);
 

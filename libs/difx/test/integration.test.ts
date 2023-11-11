@@ -40,8 +40,8 @@ describe('integration test', () => {
       {
         tag: 'item',
         act: ActionType.UPDATE,
-        src: '<object>',
-        tar: '<object>',
+        src: 'item',
+        tar: 'item',
         att: [
           {
             act: ActionType.UPDATE,
@@ -54,8 +54,8 @@ describe('integration test', () => {
           {
             tag: 'b',
             act: ActionType.UPDATE,
-            src: '<object>',
-            tar: '<object>',
+            src: 'b',
+            tar: 'b',
             att: [
               {
                 act: ActionType.UPDATE,

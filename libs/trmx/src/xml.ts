@@ -136,6 +136,7 @@ export function fromXML(
   options = {} as XMLParseOptions
 ): DataGraph | Record<string, unknown> {
   const graph = {} as DataGraph;
+  // NOTE: strict mode will fail for the use case like `attr="aa && bb"`
   const parser = createParser(true);
   const proc = createNodeProcessor(
     {
