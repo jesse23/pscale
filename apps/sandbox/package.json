@@ -1,5 +1,5 @@
 {
-  "name": "sandbox",
+  "name": "@pscale/sandbox",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -14,6 +14,11 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@chakra-ui/icons": "^2.1.1",
+    "@chakra-ui/react": "^2.8.1",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@tanstack/react-table": "^8.10.7",
     "@types/codeflask": "^1.4.4",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
@@ -25,6 +30,7 @@
     "eslint": "^8.45.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
+    "framer-motion": "^10.16.4",
     "typescript": "^5.0.2",
     "vite": "^4.4.5",
     "vite-tsconfig-paths": "^4.2.1"

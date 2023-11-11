@@ -1,0 +1,162 @@
+import { Allotment } from 'allotment';
+import { CodeEditor } from './CodeEditor';
+import { useEffect, useState } from 'react';
+import { diff, apply, preview } from '@pscale/difx';
+import { evalExpression } from 'libs/trmx/src/utils';
+import styles from './View.module.css';
+import 'allotment/dist/style.css';
+import DifxNodePreview from './DifxNodePreview';
+
+const EXAMPLE = {
+  xml: {},
+  json: {
+    source: [
+      `
+[
+  {
+    id: 'id1',
+    name: 'group1',
+    users: [
+      { id: 'id11', name: 'user11' },
+      {
+        id: 'id12',
+        name: 'user12',
+        external: true,
+        role: {
+          id: 'admin',
+          name: 'Agent Smith',
+        },
+      },
+      { id: 'id13', name: 'user13' },
+    ],
+  },
+  {
+    id: 'id2',
+    name: 'group2',
+    users: [
+      { id: 'id21', name: 'user21' },
+      { id: 'id22', name: 'user22' },
+    ],
+  },
+]
+    `,
+    ],
+    target: [
+      `
+[
+  {
+    id: 'id1',
+    name: 'group1_new',
+    users: [
+      {
+        id: 'id12',
+        name: 'user12_new',
+        modifiable: 'test',
+        role: {
+          id: 'admin',
+          name: 'NEO the One',
+        },
+      },
+      { id: 'id11', name: 'user11' },
+      { id: 'id14', name: 'user14' },
+    ], 
+  },
+  {
+    id: 'id3',
+    name: 'group3',
+    users: [{ id: 'id31', name: 'user31' }],
+  },
+]
+    `,
+    ],
+    destination: [
+      `
+[
+  {
+    id: 'id1',
+    name: 'group1',
+    users: [
+      { id: 'id11', name: 'user11' },
+      {
+        id: 'id12',
+        name: 'user12',
+        external: true,
+        role: {
+          id: 'admin',
+          name: 'Agent Smith',
+        },
+      },
+      { id: 'id13', name: 'user13' },
+    ],
+  },
+  {
+    id: 'id2',
+    name: 'group2',
+    users: [
+      { id: 'id21', name: 'user21' },
+      { id: 'id22', name: 'user22' },
+    ],
+  },
+]
+    `,
+    ],
+  },
+};
+
+export default function DifxPanel() {
+  // source
+  const [src, setSrc] = useState(EXAMPLE.json.source.join('\n').trim());
+  const [tar, setTar] = useState(EXAMPLE.json.target.join('\n').trim());
+  const [dest, setDest] = useState(EXAMPLE.json.destination.join('\n').trim());
+  const [changes, setChanges] = useState('{}');
+  // const [changes, setChanges] = useState([] as PreviewNode2[]); // PreviewNode2[
+  const [result, setResult] = useState('/* result */');
+
+  useEffect(() => {
+    try {
+      const srcData = evalExpression(src) as Record<string, unknown>;
+      const tarData = evalExpression(tar) as Record<string, unknown>;
+      const destData = evalExpression(dest) as Record<string, unknown>;
+      const opts = { reorder: true, getKey: (val: Record<string, string>) => val?.id };
+      const patch = diff(srcData, tarData, opts);
+      const changes = preview(destData, patch, opts);
+      setChanges(JSON.stringify(changes, null, 2));
+      setResult(JSON.stringify(apply(destData, patch, opts), null, 2));
+    } catch (e) {
+      setResult((e as Error).stack || '');
+    }
+  }, [src, tar, dest, result]);
+
+  return (
+    <div className={styles.container}>
+        <Allotment vertical  defaultSizes={[75, 100]}>
+          <Allotment.Pane minSize={100}>
+            <Allotment defaultSizes={[100, 100, 100]}>
+              <Allotment.Pane>
+                <CodeEditor code={src} type="js" onChange={setSrc} />
+              </Allotment.Pane>
+              <Allotment.Pane>
+                <CodeEditor code={tar} type="js" onChange={setTar} />
+              </Allotment.Pane>
+              <Allotment.Pane>
+                <CodeEditor code={dest} type="js" onChange={setDest} />
+              </Allotment.Pane>
+            </Allotment>
+          </Allotment.Pane>
+          <Allotment.Pane snap>
+            <Allotment defaultSizes={[200, 100]}>
+              <Allotment.Pane>
+                <DifxNodePreview changeContents={changes} />
+                {/* 
+                <CodeEditor code={changes} type="js" onChange={setChanges} />
+                */}
+              </Allotment.Pane>
+              <Allotment.Pane>
+                <CodeEditor code={result} type="js" onChange={setResult} />
+              </Allotment.Pane>
+            </Allotment>
+          </Allotment.Pane>
+        </Allotment>
+    </div>
+  );
+}

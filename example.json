@@ -1,0 +1,180 @@
+{
+  "isArray": true,
+  "changed": true,
+  "preview": [
+    {
+      "type": "M",
+      "key": "id1",
+      "tar": {
+        "isArray": false,
+        "changed": true,
+        "preview": [
+          {
+            "type": "N",
+            "key": "__key",
+            "src": "id1",
+            "tar": "id1"
+          },
+          {
+            "type": "N",
+            "key": "type",
+            "src": "group",
+            "tar": "group"
+          },
+          {
+            "type": "U",
+            "key": "name",
+            "src": "group 1",
+            "tar": "new group 1"
+          },
+          {
+            "type": "M",
+            "key": "users",
+            "tar": {
+              "isArray": true,
+              "changed": true,
+              "preview": [
+                {
+                  "type": "D",
+                  "key": "uid11",
+                  "src": {
+                    "__key": "uid11",
+                    "type": "user",
+                    "name": "user 11"
+                  }
+                },
+                {
+                  "type": "N",
+                  "key": "uid13",
+                  "src": {
+                    "__key": "uid13",
+                    "type": "user",
+                    "name": "user 13"
+                  },
+                  "tar": {
+                    "__key": "uid13",
+                    "type": "user",
+                    "name": "user 13"
+                  }
+                },
+                {
+                  "type": "N",
+                  "key": "uid12",
+                  "src": {
+                    "__key": "uid12",
+                    "type": "user",
+                    "name": "user 12"
+                  },
+                  "tar": {
+                    "__key": "uid12",
+                    "type": "user",
+                    "name": "user 12"
+                  },
+                  "move": true
+                },
+                {
+                  "type": "N",
+                  "key": "uid14",
+                  "src": {
+                    "__key": "uid14",
+                    "type": "user",
+                    "name": "user 14"
+                  },
+                  "tar": {
+                    "__key": "uid14",
+                    "type": "user",
+                    "name": "user 14"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "M",
+      "key": "id2",
+      "tar": {
+        "isArray": false,
+        "changed": true,
+        "preview": [
+          {
+            "type": "N",
+            "key": "__key",
+            "src": "id2",
+            "tar": "id2"
+          },
+          {
+            "type": "N",
+            "key": "type",
+            "src": "group",
+            "tar": "group"
+          },
+          {
+            "type": "N",
+            "key": "name",
+            "src": "group 2",
+            "tar": "group 2"
+          },
+          {
+            "type": "M",
+            "key": "users",
+            "tar": {
+              "isArray": true,
+              "changed": true,
+              "preview": [
+                {
+                  "type": "A",
+                  "key": "uid24",
+                  "tar": {
+                    "__key": "uid24",
+                    "type": "user",
+                    "name": "user 24"
+                  }
+                },
+                {
+                  "type": "M",
+                  "key": "uid21",
+                  "tar": {
+                    "isArray": false,
+                    "changed": true,
+                    "preview": [
+                      {
+                        "type": "N",
+                        "key": "__key",
+                        "src": "uid21",
+                        "tar": "uid21"
+                      },
+                      {
+                        "type": "N",
+                        "key": "type",
+                        "src": "user",
+                        "tar": "user"
+                      },
+                      {
+                        "type": "U",
+                        "key": "name",
+                        "src": "user 21",
+                        "tar": "new user 21"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "D",
+                  "key": "uid22",
+                  "src": {
+                    "__key": "uid22",
+                    "type": "user",
+                    "name": "user 22"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

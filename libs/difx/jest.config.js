@@ -1,7 +1,7 @@
 /* eslint-env node */
 module.exports = {
   transform: {
-    "^.+\\.tsx?$": [
+    "^.+\\.(t|j)sx?$": [
       "esbuild-jest",
       {
         sourcemap: "both",

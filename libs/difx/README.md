@@ -1,2 +1,3 @@
 # difx
-another JSON diff library
+
+Diff data structure in O(n) with some assumptions

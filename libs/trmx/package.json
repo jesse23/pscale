@@ -1,7 +1,7 @@
 {
-  "name": "trmx",
+  "name": "@pscale/trmx",
   "version": "1.0.0",
-  "description": "data mapping engine for object graph",
+  "description": "data transform for object graph",
   "main": "index.js",
   "scripts": {
     "audit": "eslint src --ext .js,.jsx,.ts,.tsx && tsc --noEmit",
@@ -11,7 +11,7 @@
   "bin": {
     "pscale": "./dist/index.js"
   },
-  "author": "",
+  "author": "jesse23",
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.5.5",
