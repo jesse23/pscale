@@ -68,6 +68,8 @@ export interface Options {
   reorder?: boolean;
   // attribute that used for getting the key
   key?: string;
+  // if true, will have fuzzy match for array element
+  fuzzy?: boolean;
 }
 
 export interface ViewOptions extends Options {

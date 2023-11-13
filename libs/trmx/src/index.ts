@@ -1,4 +1,4 @@
-import { Options } from './types';
+import { Options, XMLParseOptions } from './types';
 import { createProcess } from './process';
 import { parseRuleTable } from './rule';
 import { fromXML, toXML } from './xml';
@@ -18,8 +18,8 @@ export const trmx = (source: string[], opts: Options): string[] => {
 };
 
 // difx used API
-export const nodeFromXML = (source: string[]): Record<string, unknown> => {
-  return fromXML(source, {asTree: true});
+export const nodeFromXML = (source: string[], opts = {} as XMLParseOptions): Record<string, unknown> => {
+  return fromXML(source, {...opts, asTree: true });
 };
 
 export { nodeToXML } from './xml';

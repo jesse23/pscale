@@ -122,3 +122,10 @@ export interface OutputFormat {
 export interface DataTemplateFn {
   (ds: Data): Data;
 }
+
+export interface XMLParseOptions {
+  elem_as?: 'object' | 'attr' | 'hybrid';
+  attr_prefix?: string;
+  template?: DataTemplateFn;
+  asTree?: boolean;
+}

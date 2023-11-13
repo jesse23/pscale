@@ -9,13 +9,9 @@ import {
 } from './const';
 import { Data, DataGraph, DataTemplateFn, XMLOutput } from './types';
 import { applyTemplate, setupGraph } from './graph';
+import { XMLParseOptions } from './types';
 
-interface XMLParseOptions {
-  elem_as?: 'object' | 'attr' | 'hybrid';
-  attr_prefix?: string;
-  template?: DataTemplateFn;
-  asTree?: boolean;
-}
+
 
 export const createNodeProcessor = (
   options: XMLParseOptions,
@@ -164,7 +160,7 @@ export function fromXML(
   parser.write(source.join('')).close();
 
   return options.asTree
-    ? graph[proc.getRootTag()][0]
+    ? options.elem_as === 'attr' ? proc.completeNode() :graph[proc.getRootTag()][0]
     : setupGraph(
         options.elem_as === 'attr'
           ? applyTemplate(

@@ -106,7 +106,7 @@ const EXAMPLE = {
   },
 };
 
-export default function DifxJsonView() {
+export default function DifxJsonMergeView() {
   // source
   const [src, setSrc] = useState(EXAMPLE.json.source.join('\n').trim());
   const [tar, setTar] = useState(EXAMPLE.json.target.join('\n').trim());

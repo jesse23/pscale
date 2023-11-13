@@ -6,82 +6,272 @@ import styles from './View.module.css';
 import 'allotment/dist/style.css';
 import DifxNodeViewPanel from './DifxNodeViewPanel';
 import { nodeFromXML, nodeToXML } from '@pscale/trmx';
-import { isObject } from '@pscale/util';
-
+import { evalExpression, isObject } from '@pscale/util';
 
 const EXAMPLE = {
     source: [
       `
-<xml>
-  <group id="id1" name="group1">
-    <user id="id11" name="user11" />
-    <user desc="external user" name="user12" id="id12" external="true">
-      <role id="admin" name="external owner" />
-    </user>
-    <user id="id13" name="user13" />
-  </group>
-  <group id="id2" name="group2">
-    <user id="id21" name="user21" />
-    <user id="id22" name="user22" />
-  </group>
-</xml>
+<rules>
+  <node>
+    <rule>Has Type</rule>
+    <arg>root_type</arg>
+    <act></act>
+    <node>
+      <rule>Has Bypass</rule>
+      <arg>true</arg>
+      <act>Bypass</act>
+    </node>
+    <node collapse="true" protected="true">
+      <rule>Has Type</rule>
+      <arg>root_type</arg>
+      <act>System Objects</act>
+      <node>
+        <rule>Is Archived</rule>
+        <arg>true</arg>
+        <act>Archived Objects</act>
+      </node>
+      <node>
+        <rule>Owning User</rule>
+        <arg>admin</arg>
+        <act>System</act>
+        <node>
+          <rule>Has Type</rule>
+          <arg>sub_type_lv1</arg>
+          <act></act>
+        </node>
+        <node>
+          <rule>Has Type</rule>
+          <arg>ConfigRule</arg>
+          <act>Public Rule</act>
+        </node>
+        <node>
+          <name>In Current Program</name>
+          <arg>false</arg>
+          <act>Not Current Program</act>
+        </node>
+      </node>
+    </node>
+    <node>
+      <rule>Has Class</rule>
+      <arg>sub_type_lv1</arg>
+      <acl_name/>
+      <node>
+        <rule>Inactive Sequence</rule>
+        <arg>true</arg>
+        <act>Inactive Sequence Objects</act>
+      </node>
+    </node>
+  </node>
+</rules>
     `,
     ],
     target: [
       `
-<xml>
-  <group id="id1" name="group1_new">
-    <user id="id12" name="user12_new" desc="external user" modifiable="true">
-      <role id="admin" name="administrator" />
-    </user>
-    <user id="id11" name="user11" />
-    <user id="id14" name="user14" />
-  </group>
-  <group id="id3" name="group3">
-    <user id="id31" name="user31" />
-  </group>
-</xml>
+<rules>
+  <node>
+    <rule>Has Type</rule>
+    <arg>root_type</arg>
+    <act></act>
+    <node collapse="true" protected="true">
+      <rule>Has Type</rule>
+      <arg>root_type</arg>
+      <act>System Objects</act>
+      <node>
+        <rule>Is Archived</rule>
+        <arg>true</arg>
+        <act>Archived Objects</act>
+      </node>
+      <node>
+        <rule>Owning User</rule>
+        <arg>non-admin</arg>
+        <act>System</act>
+        <node>
+          <rule>Has Class</rule>
+          <arg>root</arg>
+          <act></act>
+        </node>
+        <node>
+          <rule>Has Type</rule>
+          <arg>ConfigRule</arg>
+          <act>Public Rule</act>
+        </node>
+        <node>
+          <rule>Has Type</rule>
+          <arg>sub_type_lv1</arg>
+          <act></act>
+        </node>
+        <node>
+          <name>In Current Program</name>
+          <arg>false</arg>
+          <act>Not Current Program</act>
+        </node>
+      </node>
+    </node>
+    <node>
+      <rule>Has Class</rule>
+      <arg>sub_type_lv1</arg>
+      <acl_name/>
+      <node>
+        <rule>Inactive Sequence</rule>
+        <arg>true</arg>
+        <act>Inactive Sequence Objects</act>
+      </node>
+    </node>
+  </node>
+</rules>
     `,
     ],
-    destination: [
-      `
-<xml>
-  <group id="id1" name="group1">
-    <user id="id11" name="user11" />
-    <user desc="external user" name="user12" id="id12" external="true">
-      <role id="admin" name="external owner" />
-    </user>
-    <user id="id13" name="user13" />
-  </group>
-  <group id="id2" name="group2">
-    <user id="id21" name="user21" />
-    <user id="id22" name="user22" />
-  </group>
-</xml>
-    `,
-    ],
+    config: [`
+{
+  reorder: true,
+  key: 'id',
+  tag:'__type',
+  defaultTag: 'xml',
+  name: 'rule',
+  fuzzy: true,
+}
+    `.trim()]
 };
+/*
+const EXAMPLE = {
+    source: [
+      `
+<rules>
+  <node>
+    <rule>Has Type</rule>
+    <arg>root_type</arg>
+    <act></act>
+    <node>
+      <rule>Has Bypass</rule>
+      <arg>true</arg>
+      <act>Bypass</act>
+    </node>
+    <node collapse="true" protected="true">
+      <rule>Has Type</rule>
+      <arg>root_type</arg>
+      <act>System Objects</act>
+      <node>
+        <rule>Is Archived</rule>
+        <arg>true</arg>
+        <act>Archived Objects</act>
+      </node>
+      <node>
+        <rule>Owning User</rule>
+        <arg>admin</arg>
+        <act>System</act>
+        <node>
+          <rule>Has Type</rule>
+          <arg>sub_type_lv1</arg>
+          <act></act>
+        </node>
+        <node>
+          <rule>Has Type</rule>
+          <arg>ConfigRule</arg>
+          <act>Public Rule</act>
+        </node>
+        <node>
+          <name>In Current Program</name>
+          <arg>false</arg>
+          <act>Not Current Program</act>
+        </node>
+      </node>
+    </node>
+    <node>
+      <rule>Has Class</rule>
+      <arg>sub_type_lv1</arg>
+      <acl_name/>
+      <node>
+        <rule>Inactive Sequence</rule>
+        <arg>true</arg>
+        <act>Inactive Sequence Objects</act>
+      </node>
+    </node>
+  </node>
+</rules>
+    `,
+    ],
+    target: [
+      `
+<rules>
+  <node>
+    <rule>Has Type</rule>
+    <arg>root_type</arg>
+    <act></act>
+    <node collapse="true" protected="true">
+      <rule>Has Type</rule>
+      <arg>root_type</arg>
+      <act>System Objects</act>
+      <node>
+        <rule>Is Archived</rule>
+        <arg>true</arg>
+        <act>Archived Objects</act>
+      </node>
+      <node>
+        <rule>Owning User</rule>
+        <arg>non-admin</arg>
+        <act>System</act>
+        <node>
+          <rule>Has Type</rule>
+          <arg>sub_type_lv1</arg>
+          <act></act>
+        </node>
+        <node>
+          <rule>Has Type</rule>
+          <arg>ConfigRule</arg>
+          <act>Public Rule</act>
+        </node>
+        <node>
+          <name>In Current Program</name>
+          <arg>false</arg>
+          <act>Not Current Program</act>
+        </node>
+      </node>
+    </node>
+    <node>
+      <rule>Has Class</rule>
+      <arg>sub_type_lv1</arg>
+      <acl_name/>
+      <node>
+        <rule>Inactive Sequence</rule>
+        <arg>true</arg>
+        <act>Inactive Sequence Objects</act>
+      </node>
+    </node>
+  </node>
+</rules>
+    `,
+    ],
+    config: [`
+{
+  reorder: true,
+  key: 'id',
+  tag:'__type',
+  defaultTag: 'xml',
+  name: 'rule',
+}
+    `.trim()]
+};
+*/
 
 export default function DifxXmlView() {
   // source
   const [src, setSrc] = useState(EXAMPLE.source.join('\n').trim());
   const [tar, setTar] = useState(EXAMPLE.target.join('\n').trim());
-  const [dest, setDest] = useState(EXAMPLE.destination.join('\n').trim());
+  const [config, setConfig] = useState(EXAMPLE.config.join('\n').trim());
   const [viewNodes, setViewNodes] = useState([] as ViewNode[]);
   const [result, setResult] = useState('/* result */');
 
   useEffect(() => {
     try {
-      const srcData = nodeFromXML(src.split('\n'));
-      const tarData = nodeFromXML(tar.split('\n'));
-      const destData = nodeFromXML(dest.split('\n'));
-      const opts = { reorder: true, key: 'id', tag:'__type', defaultTag: 'xml', name: 'name' };
+      const srcData = nodeFromXML(src.split('\n'), { elem_as: 'attr'});
+      const tarData = nodeFromXML(tar.split('\n'), { elem_as: 'attr'});
+      const configs = evalExpression(config) as Record<string, unknown>;
       // option to xml without id and name
       // const opts = { reorder: true, key: '__type', tag:'__type', defaultTag: 'xml', name: '__type' };
-      const patch = diff(srcData, tarData, opts);
-      const nodes = view(destData, patch, opts);
+      const patch = diff(srcData, tarData, configs);
+      const nodes = view(srcData, patch, configs);
       setViewNodes(() => nodes);
-      const final = apply(destData, patch, opts);
+      const final = apply(srcData, patch, configs);
       if(isObject(final)) {
         setResult(() => nodeToXML(final).join('\n'));
       } 
@@ -90,7 +280,7 @@ export default function DifxXmlView() {
       setResult((e as Error).stack || '');
       // throw e;
     }
-  }, [src, tar, dest]);
+  }, [src, tar, config]);
 
   return (
     <div className={styles.container}>
@@ -104,7 +294,7 @@ export default function DifxXmlView() {
                 <CodeEditor code={tar} type="js" onChange={setTar} />
               </Allotment.Pane>
               <Allotment.Pane>
-                <CodeEditor code={dest} type="js" onChange={setDest} />
+                <CodeEditor code={config} type="js" onChange={setConfig} />
               </Allotment.Pane>
             </Allotment>
           </Allotment.Pane>

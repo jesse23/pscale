@@ -1,17 +1,19 @@
 import { Grid, GridItem, Heading, Link } from '@chakra-ui/react';
 import TrmxView from './TrmxView';
-import DifxJsonView from './DifxJsonView';
 import DifxXmlView from './DifxXmlView';
+import DifxJsonMergeView from './DifxJsonMergeView';
+import DifxXmlMergeView from './DifxXmlMergeView';
 import { useState } from 'react';
 
 const MODE = {
-  DIFX_JSON: 'difx(json)',
   DIFX_XML: 'difx(xml)',
+  DIFX_JSON_MERGE: 'difx(json_merge)',
+  DIFX_XML_MERGE: 'difx(xml_merge)',
   TRMX: 'trmx',
 }
 
 export const SandboxPage = () => {
-  const [mode, setMode] = useState(MODE.DIFX_JSON);
+  const [mode, setMode] = useState(MODE.DIFX_XML);
   return (
     <Grid
       templateAreas={`"header"
@@ -36,8 +38,9 @@ export const SandboxPage = () => {
         borderTop="1px"
         borderColor={'#E2E8F0'}
       >
-        {mode === MODE.DIFX_JSON && <DifxJsonView /> }
-        {mode === MODE.DIFX_XML && <DifxXmlView />}
+        {mode === MODE.DIFX_XML && <DifxXmlView /> }
+        {mode === MODE.DIFX_JSON_MERGE && <DifxJsonMergeView /> }
+        {mode === MODE.DIFX_XML_MERGE && <DifxXmlMergeView />}
         {mode === MODE.TRMX && <TrmxView /> }
       </GridItem>
       <GridItem
@@ -46,13 +49,16 @@ export const SandboxPage = () => {
         borderTop="1px"
         borderColor={'#E2E8F0'}
       >
-        <Link onClick={()=>setMode(MODE.DIFX_JSON)} paddingRight={3} fontFamily={'mono'}>
-          {MODE.DIFX_JSON}{mode===MODE.DIFX_JSON?'*':' '}
-        </Link>
-        <Link onClick={()=>setMode(MODE.DIFX_XML)} paddingRight={3} fontFamily={'mono'}>
+        <Link onClick={()=>setMode(MODE.DIFX_XML)} paddingRight={5} fontFamily={'mono'}>
           {MODE.DIFX_XML}{mode===MODE.DIFX_XML?'*':' '}
         </Link>
-        <Link onClick={()=>setMode(MODE.TRMX)} paddingRight={3} fontFamily={'mono'}>
+        <Link onClick={()=>setMode(MODE.DIFX_JSON_MERGE)} paddingRight={5} fontFamily={'mono'}>
+          {MODE.DIFX_JSON_MERGE}{mode===MODE.DIFX_JSON_MERGE?'*':' '}
+        </Link>
+        <Link onClick={()=>setMode(MODE.DIFX_XML_MERGE)} paddingRight={5} fontFamily={'mono'}>
+          {MODE.DIFX_XML_MERGE}{mode===MODE.DIFX_XML_MERGE?'*':' '}
+        </Link>
+        <Link onClick={()=>setMode(MODE.TRMX)} paddingRight={5} fontFamily={'mono'}>
           {MODE.TRMX}{mode===MODE.TRMX?'*':' '}
         </Link>
       </GridItem>

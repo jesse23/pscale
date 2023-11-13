@@ -15,7 +15,7 @@ export const diff = (
   opts = {} as Options
 ): Patch => {
   // Mark all elements from list1 in the map
-  const { reorder, key } = opts;
+  const { reorder, key, fuzzy } = opts;
   const getObjectKey = (val): string =>
     (val && key && val[key]) || JSON.stringify(val);
 
@@ -91,6 +91,7 @@ export const diff = (
     // There is noting we can do for move before we apply it on the src.
     // For example, we can calculate the diff on [1, 2, 3] -> [3, 2, 1], then apply it on [3, 2, 1]
     // So we simply record the target index and source index map.
+    /*
     ...(reorder
       ? {
           [ActionType.REORDER]: matches.map(({ srcIdx, tarIdx, key }) => ({
@@ -100,7 +101,69 @@ export const diff = (
           })),
         }
       : {}),
+      */
   };
+
+  // additional matching for ADD and DELETE
+  if (fuzzy) {
+    const newAdd = [];
+    const newDel = [];
+    let i = 0,
+      j = 0;
+    const addLen = patch[ActionType.ADD]?.length || 0;
+    const delLen = patch[ActionType.DELETE]?.length || 0;
+    for (; i < addLen && j < delLen; ) {
+      const add = patch[ActionType.ADD][i];
+      const del = patch[ActionType.DELETE][j];
+      if (
+        add.key.length / del.key.length > 0.8 &&
+        add.key.length / del.key.length < 1.2
+      ) {
+        const subPatch = diff(del.val, add.val, opts);
+        patch[ActionType.MERGE] = (patch[ActionType.MERGE] || []).concat({
+          idx: del.idx,
+          key: del.key,
+          val: subPatch,
+        });
+        matches.push({ srcIdx: del.idx, tarIdx: add.idx, key: add.key });
+        i++;
+        j++;
+      } else {
+        // move forward at the bigger side - try to find a balance between accuracy and performance
+        const addLeft = addLen - i;
+        const delLeft = delLen - j;
+        if (addLeft > delLeft) {
+          newAdd.push(add);
+          i++;
+        } else {
+          newDel.push(del);
+          j++;
+        }
+      }
+    }
+
+    for (; i < (patch[ActionType.ADD]?.length || 0); i++) {
+      newAdd.push(patch[ActionType.ADD][i]);
+    }
+
+    for (; j < (patch[ActionType.DELETE]?.length || 0); j++) {
+      newDel.push(patch[ActionType.DELETE][j]);
+    }
+
+    patch[ActionType.ADD] = newAdd;
+    patch[ActionType.DELETE] = newDel;
+  }
+
+  // then reorder
+  if (reorder) {
+    patch[ActionType.REORDER] = matches
+      .map(({ srcIdx, tarIdx, key }) => ({
+        idx: srcIdx,
+        key,
+        val: tarIdx,
+      }))
+      .sort((a, b) => a.val - b.val);
+  }
 
   return patch;
 };
