@@ -7,23 +7,27 @@ import {
   KEY_TRM,
   KEY_TYPE,
 } from './const';
-import { Data, DataGraph, DataTemplateFn, XMLOutput } from './types';
+import {
+  Data,
+  DataGraph,
+  DataTemplateFn,
+  XMLOptions,
+  XMLOutput,
+} from './types';
 import { applyTemplate, setupGraph } from './graph';
 import { XMLParseOptions } from './types';
-
-
+import { isArray, isObject, isPrimitive } from '@pscale/util';
 
 export const createNodeProcessor = (
   options: XMLParseOptions,
   g?: DataGraph
 ) => {
   const path = [{}] as Data[];
-  let rootTag = '';
+  let root = null as Data;
 
   return {
-    getRootTag: () => rootTag,
+    root: () => root,
     addNode: (node: { name: string; attributes: Record<string, string> }) => {
-      rootTag = rootTag || node.name;
       const type = node.name;
       const obj = {
         [KEY_TYPE]: type,
@@ -36,6 +40,7 @@ export const createNodeProcessor = (
       } as Data;
 
       path.push(obj);
+      root = root || obj;
       if (
         g &&
         (options.elem_as === 'object' ||
@@ -106,7 +111,7 @@ export const createNodeProcessor = (
 };
 
 /**
- * Convert XML to data node tree 
+ * Convert XML to data node tree
  *
  * @param source XML input as string array
  * @param options XML parse options
@@ -160,7 +165,13 @@ export function fromXML(
   parser.write(source.join('')).close();
 
   return options.asTree
-    ? options.elem_as === 'attr' ? proc.completeNode() :graph[proc.getRootTag()][0]
+    ? // TODO: here we have a topology issue:
+      // given: <a><b>c</b></a>, its JSON format is {a: {b: 'c'}}
+      // - proc.completeNode() will return {a: {b: 'c', __type: 'a' }, __type: 'xml'},
+      // - proc.root() will only return {b: 'c', __type: 'a' }
+      options.elem_as === 'attr'
+      ? proc.completeNode()
+      : proc.root()
     : setupGraph(
         options.elem_as === 'attr'
           ? applyTemplate(
@@ -171,46 +182,115 @@ export function fromXML(
       );
 }
 
-export const nodeToXML = (node: Record<string, unknown>, indent = 0): string[] => {
-  const type = node[KEY_TYPE];
+export const nodeToXML = (
+  val: unknown,
+  tag = '',
+  opts = {
+    elem_as: 'object',
+    attr_prefix: '',
+    lvl: 0,
+  } as XMLOptions
+): string[] => {
+  const { elem_as, attr_prefix, lvl: level } = opts;
+  const lvl = level || 0;
+  const indent = ' '.repeat(lvl * 2);
   const res = [] as string[];
 
-  // element start
-  const currElem = [`${' '.repeat(indent)}<${type}`];
+  // get tag
+  tag = tag || (val as Data)[KEY_TYPE] || '';
+  if(!tag) {
+    throw new Error(`[nodeToXML] tag is empty for ${JSON.stringify(val)}`);
+  }
 
-  // attr
-  Object.entries(node).forEach(([key, value]) => {
-    if (
-      key !== KEY_TRM &&
-      key !== KEY_TYPE &&
-      key !== KEY_CHILD &&
-      key !== KEY_REFBY &&
-      key !== KEY_TEXT
-    ) {
-      currElem.push(` ${key}="${value}"`);
-    }
-  });
+  if (isObject(val)) {
+    const att = [];
+    const sub = [];
 
-  // elem end
-  currElem.push('>');
-  res.push(currElem.join(''));
-
-  // child
-  if (node[KEY_CHILD]) {
-    ([]).concat(node[KEY_CHILD]).forEach((child) => {
-      res.push(...nodeToXML(child, indent + 2));
+    // attr
+    Object.entries(val).forEach(([key, value]) => {
+      if (
+        key !== KEY_TRM &&
+        key !== KEY_TYPE &&
+        key !== KEY_CHILD &&
+        key !== KEY_REFBY &&
+        key !== KEY_TEXT
+      ) {
+        if (
+          isPrimitive &&
+          // either elem_as_object, or prefix is set for elem_as_attr
+          (elem_as !== 'attr' || (attr_prefix && key.startsWith(attr_prefix)))
+        ) {
+          att.push({ key, value });
+        } else {
+          if (elem_as === 'attr') {
+            sub.push({ key, value });
+          } else {
+            console.warn(
+              `[nodeToXML] object attribute is not supported for elem_as=${elem_as}, will ignore`
+            );
+          }
+        }
+      }
     });
+
+    // KEY_CHILD
+    if (elem_as !== 'attr' && val[KEY_CHILD]) {
+      sub.push(
+        ...[]
+          .concat(val[KEY_CHILD])
+          .map((c) => ({ key: c[KEY_TYPE] as string, value: c }))
+      );
+    }
+
+    // elem and att
+    const elemLine = [`${indent}<${tag}`];
+    att.forEach(({ key, value }) => {
+      elemLine.push(
+        ` ${attr_prefix ? key.replace(attr_prefix, '') : key}="${value}"`
+      );
+    });
+    elemLine.push('>');
+    res.push(elemLine.join(''));
+
+    // sub
+    sub.forEach(({ key, value }) => {
+      res.push(...nodeToXML(value, key, { ...opts, lvl: lvl + 1 }));
+    });
+
+    // text
+    const text = (val[KEY_TEXT] as string)?.trim();
+    if (text) {
+      res.push(`${' '.repeat((lvl + 1) * 2)}${text}`);
+    }
+
+    // elem end
+    res.push(`${indent}</${tag}>`);
+  } else if (isPrimitive(val)) {
+    if (elem_as === 'attr') {
+      res.push(`${indent}<${tag}>${val === undefined ? '' : val}</${tag}>`);
+    } else {
+      console.warn(
+        `[nodeToXML] primitive value is not supported for elem_as=${elem_as}, will ignore`
+      );
+    }
+  } else if (isArray(val)) {
+    if (elem_as === 'attr') {
+      res.push(
+        ...val.reduce((prev, curr) => {
+          prev.push(...nodeToXML(curr, tag, { ...opts, lvl: lvl + 1 }));
+          return prev;
+        }, [])
+      );
+    } else {
+      console.warn(
+        `[nodeToXML] array value is not supported for elem_as=${elem_as}, will ignore`
+      );
+    }
+  } else {
+    throw new Error(
+      `[nodeToXML] unsupported value type for ${JSON.stringify(val)}`
+    );
   }
-
-  // text
-  const text = (node[KEY_TEXT] as string)?.trim();
-  if (text) {
-    res.push(`${' '.repeat(indent + 2)}${text}`);
-  }
-
-  // elem end
-  res.push(`${' '.repeat(indent)}</${type}>`);
-
   return res;
 };
 
@@ -222,5 +302,7 @@ export const nodeToXML = (node: Record<string, unknown>, indent = 0): string[] =
  */
 export const toXML = (ds: DataGraph, template: DataTemplateFn): string[] => {
   const root = applyTemplate(ds, template) as unknown as XMLOutput;
-  return nodeToXML(root[KEY_ROOT]);
+  // TODO: why do we need KEY_ROOT here?
+  const rootNode = root[KEY_ROOT];
+  return nodeToXML(rootNode);
 };

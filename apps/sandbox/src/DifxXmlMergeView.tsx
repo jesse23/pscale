@@ -75,9 +75,9 @@ export default function DifxXmlMergeView() {
       const srcData = nodeFromXML(src.split('\n'));
       const tarData = nodeFromXML(tar.split('\n'));
       const destData = nodeFromXML(dest.split('\n'));
-      const opts = { reorder: true, key: 'id', tag:'__type', defaultTag: 'xml', name: 'rule' };
+      const opts = { reorder: true, key: 'id', tag:'__type', name: 'rule' };
       // option to xml without id and name
-      // const opts = { reorder: true, key: '__type', tag:'__type', defaultTag: 'xml', name: '__type' };
+      // const opts = { reorder: true, key: '__type', tag:'__type', name: '__type' };
       const patch = diff(srcData, tarData, opts);
       const nodes = view(destData, patch, opts);
       setViewNodes(() => nodes);

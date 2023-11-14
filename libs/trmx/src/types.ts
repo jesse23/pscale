@@ -129,3 +129,8 @@ export interface XMLParseOptions {
   template?: DataTemplateFn;
   asTree?: boolean;
 }
+
+export interface XMLOptions extends XMLParseOptions {
+  tag?: string;
+  lvl?: number;
+}

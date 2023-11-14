@@ -69,7 +69,7 @@ export interface Options {
   // attribute that used for getting the key
   key?: string;
   // if true, will have fuzzy match for array element
-  fuzzy?: boolean;
+  fuzzy?: number;
 }
 
 export interface ViewOptions extends Options {
@@ -77,6 +77,6 @@ export interface ViewOptions extends Options {
   name?: string;
   // attribute that used for getting the tag
   tag?: string;
-  // tag for the top level element(s)
+  // tag for the top level element(s), internal purpose
   defaultTag?: string;
 }

@@ -119,9 +119,9 @@ export default function DifxJsonMergeView() {
       const srcData = evalExpression(src) as Record<string, unknown>;
       const tarData = evalExpression(tar) as Record<string, unknown>;
       const destData = evalExpression(dest) as Record<string, unknown>;
-      const opts = { reorder: true, key: 'id', defaultTag: '', name: 'name' };
+      const opts = { reorder: true, key: 'id', name: 'name' };
       // for object without key id
-      // const opts = { reorder: true, key: 'name', defaultTag: '', name: 'name' };
+      // const opts = { reorder: true, key: 'name', name: 'name' };
       const patch = diff(srcData, tarData, opts);
       const nodes = view(destData, patch, opts);
       const final = apply(destData, patch, opts);
