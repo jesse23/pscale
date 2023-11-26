@@ -1,12 +1,5 @@
 # RFC 006 - [Done] object relation
 
-|            |          |
-| ---------- | -------- |
-| _Creator_  | @jesse23 |
-| _Reviewer_ |          |
-| _Approval_ |          |
-| _End Date_ |          |
-
 ## Background
 
 Figure out a way to map object relation.

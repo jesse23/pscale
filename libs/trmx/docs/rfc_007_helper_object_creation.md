@@ -1,12 +1,5 @@
 # RFC 007 - [Done] New Object Creation
 
-|            |          |
-| ---------- | -------- |
-| _Creator_  | @jesse23 |
-| _Reviewer_ |          |
-| _Approval_ |          |
-| _End Date_ |          |
-
 ## Background
 
 Approach to split or create helper objects

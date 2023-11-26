@@ -7,16 +7,16 @@ import {
   ApplyAction,
   Value,
   DataGraph,
-} from "./types";
-import { evalExpression } from "@pscale/util";
-import { VAR_SRC, VAR_VAL, KEY_TYPE } from "./const";
-import { createRefs, trvByPaths } from "./graph";
+} from './types';
+import { evalExpression } from '@pscale/util';
+import { VAR_SRC, VAR_VAL } from './const';
+import { createObject, createRefs, trvByPaths } from './graph';
 
 export const createWhereAction = (clause: string): WhereAction => {
   return {
-    exec: (src, ctx) => {
+    exec: (val, src, ctx) => {
       return clause
-        ? Boolean(evalExpression(clause, { [VAR_SRC]: src, ...ctx }, true))
+        ? Boolean(evalExpression(clause, { [VAR_VAL]: val, [VAR_SRC]: src, ...ctx }, true))
         : true;
     },
   };
@@ -24,9 +24,9 @@ export const createWhereAction = (clause: string): WhereAction => {
 
 export const createApplyAction = (clause: string): ApplyAction => {
   return {
-    exec: (val, ctx) => {
+    exec: (val, src, ctx) => {
       return clause
-        ? (evalExpression(clause, { [VAR_VAL]: val, ...ctx }, true) as Value)
+        ? (evalExpression(clause, { [VAR_VAL]: val, [VAR_SRC]: src, ...ctx }, true) as Value)
         : val;
     },
   };
@@ -74,10 +74,11 @@ export const createUpdateAction = (
 
               if (enableObjectCreation && endResult.length === 0) {
                 // if not endResult create new objects
-                const createdObjects = values.map((v) => ({
-                  [KEY_TYPE]: lastTrvDef.vs,
-                  [lastTrvDef.eg]: v,
-                }));
+                const createdObjects = values.map((v) =>
+                  createObject(lastTrvDef.vs, {
+                    [lastTrvDef.eg]: v,
+                  })
+                );
                 subGraph[lastTrvDef.vs] = createdObjects;
                 endResult.push(...createdObjects);
               }
@@ -92,7 +93,7 @@ export const createUpdateAction = (
             }
           } else {
             // not supported yet, will skip
-            console.log("not supported yet, will skip");
+            console.log('not supported yet, will skip');
           }
         }
         return subGraph;

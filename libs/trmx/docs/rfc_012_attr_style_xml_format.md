@@ -1,12 +1,5 @@
 # RFC 012 - [Draft] Attribute Style XML Format
 
-|            |          |
-| ---------- | -------- |
-| _Creator_  | @jesse23 |
-| _Reviewer_ |          |
-| _Approval_ |          |
-| _End Date_ |          |
-
 ## Background
 
 Approach to adopt data from Attribute Style XML.

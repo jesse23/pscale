@@ -1,12 +1,5 @@
 # RFC 001 - [Done] Rule Pattern
 
-|            |          |
-| ---------- | -------- |
-| _Creator_  | @jesse23 |
-| _Reviewer_ |          |
-| _Approval_ |          |
-| _End Date_ |          |
-
 ## Background
 
 As a bootstrap, create a boilerplate for next step.

@@ -260,6 +260,8 @@ export const preview = (
       // console.log(`ADD: {idx: ${idx}, key: ${key}, val: ${val}} already exists. Skip.`);
     } else {
       changed = true;
+      // TODO: this is wrong if there are many delete before this add
+      // It is taking the assumption on if there are just one add and one delete it will be handled
       res.splice(idx, 0, {
         act: ActionType.ADD,
         key,

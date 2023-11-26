@@ -71,11 +71,11 @@ export interface UpdateAction {
 }
 
 export interface WhereAction {
-  exec: (src: Data, ctx: Record<string, unknown>) => boolean;
+  exec: (val: Value, src: Data, ctx: Record<string, unknown>) => boolean;
 }
 
 export interface ApplyAction {
-  exec: (src: Value, ctx: Record<string, unknown>) => Value;
+  exec: (val: Value, src: Data, ctx: Record<string, unknown>) => Value;
 }
 
 export interface ActionFlow {

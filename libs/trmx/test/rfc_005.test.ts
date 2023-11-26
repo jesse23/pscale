@@ -1,7 +1,7 @@
 import { DataGraph, RuleInput } from "../src/types";
 import { KEY_TYPE } from "../src/const";
 import { createMutations, createProcess, process } from "../src/process";
-import { parseMutationRules } from "../src/parse";
+import { parseTransformRules } from "../src/parse";
 import { parseRuleTable } from "../src/rule";
 import { purifyGraph } from "../src/graph";
 
@@ -74,7 +74,7 @@ describe("integration test for rfc_005", () => {
       },
     ];
 
-    const mutations = createMutations(parseMutationRules(rules));
+    const mutations = createMutations(parseTransformRules(rules));
 
     const output = process(source, mutations, []);
 

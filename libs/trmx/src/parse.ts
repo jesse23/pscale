@@ -79,8 +79,8 @@ export const getTargetType = (ruleDef: RuleDef): string => ruleDef.tar[0].vs;
 export const getTargetEndType = (ruleDef: RuleDef): string =>
   ruleDef.tar[ruleDef.tar.length - 1].vs;
 
-export const parseMutationRules = (rules: RuleInput[]): RuleDef[] => {
-  const mutatDef = rules
+export const parseTransformRules = (rules: RuleInput[]): RuleDef[] => {
+  const ruleDefs = rules
     .map((rule) => {
       const { src, tar, func, cond } = rule;
       const srcTrv = parseTrvRule(src);
@@ -99,15 +99,13 @@ export const parseMutationRules = (rules: RuleInput[]): RuleDef[] => {
     })
     .filter(Boolean);
 
-  return mutatDef;
+  return ruleDefs;
 };
 
-export const parseTransformRules = (rules: RuleInput[]): RuleDef[][] => {
+export const groupByStartType = (rules: RuleDef[]): RuleDef[][] => {
   return Object.values(
     rules.reduce((prev, rule) => {
-      const { src, tar, func, cond } = rule;
-      const srcTrv = parseTrvRule(src);
-      const tarTrv = parseTrvRule(tar);
+      const { src: srcTrv, tar: tarTrv } = rule;
 
       if (srcTrv.length > 0 && tarTrv.length > 0) {
         const sourceType = srcTrv[0].vs;
@@ -119,12 +117,7 @@ export const parseTransformRules = (rules: RuleInput[]): RuleDef[][] => {
           ...prev,
           [transformKey]: [
             ...(prev[transformKey] || []),
-            {
-              src: srcTrv,
-              tar: tarTrv,
-              func: parseExpr(func, sourceType),
-              cond: parseExpr(cond, sourceType),
-            },
+            rule,
           ],
         };
       }

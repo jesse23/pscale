@@ -155,3 +155,11 @@ export const purifyGraph = (graph: DataGraph): DataGraph => {
  */
 export const applyTemplate = (ds: Data, templateFn: DataTemplateFn): DataGraph =>
   templateFn(ds) as DataGraph
+
+export const createObject = (type: string, data = {} as Data): Data => {
+  // console.log('createObject', type, data);
+  return {
+    [KEY_TYPE]: type,
+    ...data,
+  };
+}

@@ -113,7 +113,7 @@ export default function TrmxPanel() {
       });
       setTar(tar.join('\n'));
     } catch (e) {
-      setTar((e as Error).message);
+      setTar((e as Error).stack);
     }
   }, [rules, src, tar, cfg]);
 

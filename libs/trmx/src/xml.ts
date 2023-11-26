@@ -14,7 +14,7 @@ import {
   XMLOptions,
   XMLOutput,
 } from './types';
-import { applyTemplate, setupGraph } from './graph';
+import { applyTemplate, createObject, setupGraph } from './graph';
 import { XMLParseOptions } from './types';
 import { isArray, isObject, isPrimitive } from '@pscale/util';
 
@@ -29,15 +29,12 @@ export const createNodeProcessor = (
     root: () => root,
     addNode: (node: { name: string; attributes: Record<string, string> }) => {
       const type = node.name;
-      const obj = {
-        [KEY_TYPE]: type,
-        ...(options.attr_prefix
+      const obj = createObject(type, (options.attr_prefix
           ? Object.entries(node.attributes).reduce((prev, [attr, val]) => {
               prev[`${options.attr_prefix}${attr}`] = val;
               return prev;
-            }, {} as Record<string, unknown>)
-          : node.attributes),
-      } as Data;
+            }, {} as Record<string, string>)
+          : node.attributes));
 
       path.push(obj);
       root = root || obj;
@@ -216,7 +213,7 @@ export const nodeToXML = (
         key !== KEY_TEXT
       ) {
         if (
-          isPrimitive &&
+          isPrimitive(value) &&
           // either elem_as_object, or prefix is set for elem_as_attr
           (elem_as !== 'attr' || (attr_prefix && key.startsWith(attr_prefix)))
         ) {

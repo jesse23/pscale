@@ -1,12 +1,5 @@
 # RFC 005 - [Done] Mutation Rules
 
-|            |          |
-| ---------- | -------- |
-| _Creator_  | @jesse23 |
-| _Reviewer_ |          |
-| _Approval_ |          |
-| _End Date_ |          |
-
 ## Background
 
 Rules to update data graph.

@@ -1,12 +1,5 @@
 # RFC 010 - [Done] RefBy Relation
 
-|            |          |
-| ---------- | -------- |
-| _Creator_  | @jesse23 |
-| _Reviewer_ |          |
-| _Approval_ |          |
-| _End Date_ |          |
-
 ## Background
 
 Approach to traverse reverse direction

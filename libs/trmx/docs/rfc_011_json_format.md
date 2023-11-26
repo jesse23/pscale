@@ -1,12 +1,5 @@
 # RFC 011 - [Done] JSON Format
 
-|            |          |
-| ---------- | -------- |
-| _Creator_  | @jesse23 |
-| _Reviewer_ |          |
-| _Approval_ |          |
-| _End Date_ |          |
-
 ## Background
 
 Approach to adopt data like JSON.

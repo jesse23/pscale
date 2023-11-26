@@ -1,6 +1,6 @@
 # difx
 
-Diff data structure in O(n) with some assumptions.
+Diff, preview and apply changes to data structures in O(n) time complexity.
 
 ## Usage
 ```javascript

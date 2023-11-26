@@ -1,4 +1,4 @@
-import { KEY_CHILD, KEY_ROOT, KEY_TEXT } from './const';
+import { KEY_CHILD, KEY_ROOT, KEY_TEXT, KEY_TYPE } from './const';
 import { purifyGraph } from './graph';
 import { fromXML, toXML } from './xml';
 
@@ -342,5 +342,24 @@ describe('toXML', () => {
       '  </b>',
       '</a>',
     ]);
+  });
+
+  it('test toXML for object attribute (elem_as_object)', () => {
+    expect(
+      toXML({
+        item: [
+          {
+            [KEY_TYPE]: 'item',
+            a: 'b',
+            b: {
+              c: 'd',
+            },
+            [KEY_TEXT]: 'text',
+          },
+        ],
+      }, (ds) => ({
+        [KEY_ROOT]: ds.item[0],
+      }))
+    ).toStrictEqual(['<item a="b">', '  text', '</item>']);
   });
 });
