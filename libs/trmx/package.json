@@ -1,16 +1,19 @@
 {
   "name": "@pscale/trmx",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "data transform for object graph",
-  "main": "dist/index.js",
   "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "audit": "eslint src --ext .js,.jsx,.ts,.tsx && tsc --noEmit",
-    "build": "esbuild src/index.ts --bundle --platform=node --target=node18 --sourcemap --outfile=dist/index.js --external:esbuild-node-externals",
+    "build": "npm run build:src && npm run build:dts",
+    "build:src": "esbuild src/index.ts --bundle --platform=node --target=node18 --sourcemap --outdir=dist --external:esbuild-node-externals",
+    "build:dts": "dts-bundle-generator -o dist/index.d.ts src/index.ts",
     "test": "jest"
   },
   "bin": {
-    "pscale": "./dist/index.js"
+    "trmx": "./dist/index.js"
   },
   "author": "jesse23",
   "license": "MIT",

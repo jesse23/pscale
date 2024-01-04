@@ -11,6 +11,8 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@pscale/difx": "1.0.1",
+    "@pscale/trmx": "1.0.1",
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.1",
     "@emotion/react": "^11.11.1",

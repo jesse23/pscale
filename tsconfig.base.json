@@ -10,7 +10,7 @@
     "module": "ESNext",
     "moduleResolution": "node",
     "declaration": true,
-    "noEmit": true,
+    // "noEmit": true,
     "composite": false,
     // "incremental": true,
     "noEmitHelpers": true,

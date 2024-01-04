@@ -146,7 +146,7 @@ describe("createWhereAction", () => {
       desc: "test1",
     };
 
-    expect(where.exec(src, {})).toStrictEqual(false);
+    expect(where.exec(src, {}, {})).toStrictEqual(false);
   });
 
   it("test createWhereAction (true)", () => {
@@ -157,7 +157,7 @@ describe("createWhereAction", () => {
       desc: "test1",
     };
 
-    expect(where.exec(src, {})).toStrictEqual(true);
+    expect(where.exec(src, {}, {})).toStrictEqual(true);
   });
 });
 
@@ -170,6 +170,6 @@ describe("createApplyAction", () => {
       desc: "test1",
     };
 
-    expect(apply.exec(src, {})).toStrictEqual("test12");
+    expect(apply.exec(src, {}, {})).toStrictEqual("test12");
   });
 });

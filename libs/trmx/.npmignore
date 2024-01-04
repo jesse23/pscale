@@ -1,0 +1,12 @@
+
+# root config
+.npmignore
+.npmrc
+jest.config.js
+tsconfig.json
+
+# source
+src
+docs
+test
+
