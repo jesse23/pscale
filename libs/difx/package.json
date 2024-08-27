@@ -13,5 +13,8 @@
     "test": "jest"
   },
   "author": "jesse23",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "fuzzball": "^2.1.2"
+  }
 }

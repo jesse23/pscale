@@ -1,5 +1,6 @@
 import { ActionType, IndexedKeyValue, Patch, Options } from './types';
 import { isArray, isObject } from '@pscale/util';
+import {ratio} from 'fuzzball/ultra_lite';
 
 /**
  * Differentiate two array and get the patch
@@ -17,7 +18,9 @@ export const diff = (
   // Mark all elements from list1 in the map
   const { reorder, key, fuzzy } = opts;
   const getObjectKey = (val): string =>
+    // TODO: need to change with preview together
     (val && key && val[key]) || JSON.stringify(val);
+    // (val && key && val[key]) || (isObject(val) ?  JSON.stringify({...val, __child: undefined}): JSON.stringify(val));
 
   const isSrcArr = isArray(src);
   const isTarArr = isArray(tar);
@@ -96,7 +99,7 @@ export const diff = (
   // - balance between accuracy and performance, can be improve later
   if (fuzzy) {
     if (fuzzy > 0 && fuzzy < 1) {
-      const maxFuzzyRange = 1 + fuzzy;
+      // const maxFuzzyRange = 1 + fuzzy;
       const minFuzzyRange = 1 - fuzzy;
       const newAdd = [];
       const newDel = [];
@@ -107,10 +110,17 @@ export const diff = (
       for (; i < addLen && j < delLen; ) {
         const add = patch[ActionType.ADD][i];
         const del = patch[ActionType.DELETE][j];
+        const fuzzRatio = ratio(add.key, del.key)/100;
+        console.log('fuzzRatio', fuzzRatio);
+        if(
+          fuzzRatio > minFuzzyRange
+        ) {
+        /*
         if (
           add.key.length / del.key.length > minFuzzyRange &&
           add.key.length / del.key.length < maxFuzzyRange
         ) {
+          */
           const subPatch = diff(del.val, add.val, opts);
           patch[ActionType.MERGE] = (patch[ActionType.MERGE] || []).concat({
             idx: del.idx,

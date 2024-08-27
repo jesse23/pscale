@@ -81,7 +81,9 @@ export const preview = (
 ): Change => {
   const { key } = opts;
   const getObjectKey = (val): string =>
+    // TODO: same change appears in diff.ts
     (val && key && val[key]) || JSON.stringify(val);
+    // (val && key && val[key]) || (isObject(val) ?  JSON.stringify({...val, __child: undefined}): JSON.stringify(val));
 
   const isSrcArr = isArray(src);
   const srcAsArray: IndexedKeyValue[] = Object.entries(src).map(
