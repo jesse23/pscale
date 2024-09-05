@@ -10,5 +10,11 @@ export default defineConfig({
     commonjsOptions: {
       include: ['../../libs/**', /node_modules\//],
     },
+  },
+  envPrefix: 'PSCALE_',
+  server: {
+    fs: {
+      allow: ['.local', 'src']
+    }
   }
 })
